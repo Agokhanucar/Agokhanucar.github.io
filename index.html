@@ -1,0 +1,774 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ahmet Gökhan Uçar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ahmet Gökhan Uçar: Full Stack Developer ve Bilgi İşlem Uzmanı, İstanbul.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: an 8-bit game. Full-bleed pixel scene (me at my desk, İstanbul skyline behind) with a dialog box; sections read like game screens: player card, quest log, main quest, inventory, training, continue. Day palette in light mode, night scene in dark mode. */
+:root {
+  --bg: #e6efff;
+  --panel: #ffffff;
+  --ink: #1a1c35;
+  --muted: #50567a;
+  --border: #1a1c35;
+  --shadow: rgba(26, 28, 53, 0.9);
+  --accent: #e2463b;
+  --accent2: #2d63d8;
+  --gold: #f5b82e;
+  --green: #2a8f3f;
+  --chip: #eef3ff;
+  --frame-bg: #a6cbff;
+  /* scene */
+  --sky1: #5f9bff; --sky2: #7db0ff; --sky3: #a6cbff;
+  --city: #8fb5ef; --city2: #7aa2e0;
+  --water: #4f86e0; --water2: #9cc4ff;
+  --grass: #46b04a; --grass2: #2f8a3a;
+  --dirt: #a8693a; --dirt2: #8a5230;
+  --cloud: #ffffff; --cloud2: #cfe1ff;
+  --night: 0;
+  --f-pixel: "Press Start 2P", "Courier New", monospace;
+  --f-body: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1030; --panel: #181c45; --ink: #eef0ff; --muted: #a8aed8; --border: #6f78cc; --shadow: rgba(0, 0, 0, 0.75);
+    --accent: #ff6b5e; --accent2: #86a8ff; --gold: #ffcc4d; --green: #62d47c; --chip: #222862; --frame-bg: #1d2560;
+    --sky1: #0a0d26; --sky2: #121845; --sky3: #1d2560;
+    --city: #1b2153; --city2: #252c68;
+    --water: #10164a; --water2: #3a4a9a;
+    --grass: #2b6e37; --grass2: #1d4f28;
+    --dirt: #5e3a22; --dirt2: #462a18;
+    --cloud: #2c3470; --cloud2: #222959;
+    --night: 1;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1030; --panel: #181c45; --ink: #eef0ff; --muted: #a8aed8; --border: #6f78cc; --shadow: rgba(0, 0, 0, 0.75);
+  --accent: #ff6b5e; --accent2: #86a8ff; --gold: #ffcc4d; --green: #62d47c; --chip: #222862; --frame-bg: #1d2560;
+  --sky1: #0a0d26; --sky2: #121845; --sky3: #1d2560;
+  --city: #1b2153; --city2: #252c68;
+  --water: #10164a; --water2: #3a4a9a;
+  --grass: #2b6e37; --grass2: #1d4f28;
+  --dirt: #5e3a22; --dirt2: #462a18;
+  --cloud: #2c3470; --cloud2: #222959;
+  --night: 1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 18px; line-height: 1.55;
+}
+a { color: var(--accent2); }
+:focus-visible { outline: 3px dashed var(--accent); outline-offset: 4px; }
+.wrap {
+  max-width: 1040px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.px { background: var(--panel); border: 4px solid var(--border); box-shadow: 6px 6px 0 var(--shadow); }
+
+/* HUD */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: #12132a; }
+.hud { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: #12132a; color: #ffffff; border-bottom: 4px solid #000000; }
+.hud .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.hud-l { display: flex; align-items: center; gap: 22px; font-family: var(--f-pixel); font-size: 11px; white-space: nowrap; }
+.hud-l a { color: #ffffff; text-decoration: none; }
+.hud-l .xp { color: #ffcc4d; font-variant-numeric: tabular-nums; }
+.hud ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 14px; flex-wrap: nowrap; }
+.hud-l { gap: 16px !important; }
+.hud ul a { color: #c9cdf2; text-decoration: none; font-size: 16px; }
+.hud ul a:hover { color: #ffcc4d; }
+.hud ul a::before { content: "▶ "; color: transparent; font-size: 11px; }
+.hud ul a:hover::before { color: #ffcc4d; }
+@media (max-width: 1000px) { .hud ul { display: none; } }
+
+/* HERO */
+.hero { position: relative; overflow: hidden; background: var(--dirt); min-height: 540px; display: flex; align-items: center; }
+.scene { position: absolute; inset: 0; overflow: hidden; cursor: pointer; }
+.scene canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+.hero .wrap { position: relative; width: 100%; padding-block: 56px 96px; pointer-events: none; }
+.dialog { max-width: 470px; padding: 26px 26px 22px; pointer-events: auto; }
+.tag { display: inline-block; font-family: var(--f-pixel); font-size: 10px; background: var(--accent); color: #ffffff; padding: 6px 8px; margin-bottom: 16px; }
+h1 { font-family: var(--f-pixel); font-weight: 400; font-size: clamp(20px, 2.8vw, 28px); line-height: 1.45; margin: 0 0 16px; text-wrap: balance; hyphens: none; }
+.cls { margin: 0 0 14px; font-size: 17px; display: grid; gap: 2px; }
+.cls b { font-family: var(--f-pixel); font-size: 10px; font-weight: 400; color: var(--muted); display: inline-block; width: 92px; }
+.lede { margin: 0 0 20px; color: var(--muted); }
+.btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.pbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 11px/1 var(--f-pixel); padding: 13px 16px; text-decoration: none; cursor: pointer;
+  background: var(--accent); color: #ffffff; border: 4px solid var(--border);
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.25), 4px 4px 0 var(--shadow);
+}
+.pbtn.alt { background: var(--panel); color: var(--ink); box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.08), 4px 4px 0 var(--shadow); }
+.pbtn:active { transform: translate(3px, 3px); box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.25), 1px 1px 0 var(--shadow); }
+.pause { position: absolute; z-index: 2; top: 14px; right: max(16px, env(safe-area-inset-right, 0px)); font-size: 9px; padding: 8px 10px; }
+.hint { margin: 16px 0 0; font-size: 15px; color: var(--muted); }
+.hint span { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.pop {
+  position: absolute; z-index: 3; pointer-events: none; transform: translate(-50%, -50%);
+  font: 11px var(--f-pixel); color: #ffcc4d; text-shadow: 2px 2px 0 #000000, -2px -2px 0 #000000, 2px -2px 0 #000000, -2px 2px 0 #000000;
+  animation: rise 1s steps(10) forwards; white-space: nowrap;
+}
+@keyframes rise { to { transform: translate(-50%, -260%); opacity: 0; } }
+
+@media (max-width: 900px) {
+  .hero { display: block; min-height: 0; }
+  .scene { bottom: auto; height: 300px; }
+  .hero .wrap { padding-block: 270px 36px; }
+  .dialog { max-width: none; }
+}
+
+/* sections */
+section { padding-block: 64px; }
+.head { margin-bottom: 30px; }
+.eyebrow { font-family: var(--f-pixel); font-size: 11px; color: var(--accent); margin: 0 0 10px; }
+.eyebrow::before { content: "◆ "; color: var(--gold); }
+h2 { font-family: var(--f-body); font-weight: 700; font-size: clamp(28px, 4vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--f-body); font-weight: 700; font-size: 22px; line-height: 1.2; margin: 0; }
+.band { background: var(--panel); border-block: 4px solid var(--border); }
+
+/* player card */
+.card { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start; }
+.card > * { min-width: 0; }
+.portrait { padding: 12px; }
+.frame { position: relative; aspect-ratio: 1; max-width: 100%; background: var(--frame-bg); overflow: hidden; }
+.frame canvas, .frame img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.frame canvas { image-rendering: pixelated; }
+.portrait .pbtn { width: 100%; justify-content: center; margin-top: 12px; font-size: 10px; }
+.stats { margin: 0 0 22px; display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; }
+.stats dt { font-family: var(--f-pixel); font-size: 10px; color: var(--muted); padding-top: 6px; }
+.stats dd { margin: 0; font-weight: 600; }
+.card p { margin: 0 0 14px; max-width: 62ch; }
+@media (max-width: 760px) { .card { grid-template-columns: 1fr; } .portrait { max-width: 320px; } }
+
+/* quest log */
+.quests { display: grid; gap: 28px; list-style: none; margin: 0; padding: 0; }
+.quest { padding: 22px 24px; display: grid; grid-template-columns: 76px 1fr; gap: 20px; }
+.quest > * { min-width: 0; }
+.lv { font-family: var(--f-pixel); font-size: 10px; text-align: center; background: var(--accent2); color: #ffffff; padding: 10px 4px; border: 4px solid var(--border); align-self: start; line-height: 1.7; }
+.lv strong { display: block; font-size: 22px; font-weight: 400; }
+.q-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 16px; }
+.when { font-family: var(--f-pixel); font-size: 10px; color: var(--muted); white-space: nowrap; }
+.org { margin: 4px 0 12px; color: var(--muted); }
+.org b { color: var(--ink); }
+.quest ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; max-width: 74ch; }
+.quest li { padding-left: 22px; position: relative; }
+.quest li::before { content: ""; position: absolute; left: 4px; top: 0.6em; width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 0 2px var(--border); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip { font-size: 15px; padding: 3px 10px; background: var(--chip); border: 2px solid var(--border); }
+.lvup { display: inline-block; margin-top: 14px; font-family: var(--f-pixel); font-size: 10px; color: #1a1c35; background: var(--gold); padding: 7px 9px; border: 3px solid var(--border); }
+@media (max-width: 560px) { .quest { grid-template-columns: 1fr; gap: 14px; } .lv { justify-self: start; padding: 8px 10px; } .lv strong { display: inline; font-size: 14px; margin-left: 6px; } }
+
+/* main quest */
+.boss { padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+.boss > * { min-width: 0; }
+.boss p { margin: 10px 0 0; color: var(--muted); }
+.path { display: grid; gap: 10px; }
+.step { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 3px solid var(--border); background: var(--chip); }
+.step i { font-style: normal; font-family: var(--f-pixel); font-size: 10px; color: #ffffff; background: var(--accent2); width: 26px; height: 26px; display: grid; place-items: center; flex-shrink: 0; }
+.step.last i { background: var(--green); }
+@media (max-width: 760px) { .boss { grid-template-columns: 1fr; } }
+
+/* inventory */
+.inv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.inv > * { min-width: 0; }
+.bag { padding: 20px; }
+.bag .eyebrow { font-size: 9px; margin-bottom: 6px; }
+.bag h3 { margin-bottom: 14px; }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot { font-size: 16px; padding: 6px 10px; background: var(--chip); border: 2px solid var(--border); box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.12); }
+.slot small { font-size: 12px; color: var(--accent); }
+@media (max-width: 900px) { .inv { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .inv { grid-template-columns: 1fr; } }
+
+/* training */
+.train { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.train > * { min-width: 0; }
+.train article { padding: 20px; }
+.train .when { display: block; margin-bottom: 10px; }
+.train .now { color: var(--green); }
+.train p { margin: 8px 0 0; color: var(--muted); }
+@media (max-width: 860px) { .train { grid-template-columns: 1fr; } }
+
+/* continue */
+.cont { text-align: center; }
+.big { font-family: var(--f-pixel); font-size: clamp(22px, 4vw, 40px); margin: 0 0 12px; line-height: 1.3; }
+.cont .sub { color: var(--muted); margin: 0 auto 32px; max-width: 46ch; }
+.contact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 760px; margin: 0 auto; text-align: left; }
+.row { padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.row > div { min-width: 0; }
+.row .k { font-family: var(--f-pixel); font-size: 9px; color: var(--muted); margin-bottom: 6px; }
+.row .v { font-weight: 600; overflow-wrap: anywhere; }
+.row a.v { color: var(--ink); text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+.row .pbtn { padding: 10px 12px; font-size: 9px; flex-shrink: 0; }
+@media (max-width: 640px) { .contact { grid-template-columns: 1fr; } }
+
+footer { background: #12132a; color: #c9cdf2; border-top: 4px solid #000000; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 22px 30px; font-family: var(--f-pixel); font-size: 9px; line-height: 1.8; }
+footer .ps { color: #ffcc4d; animation: blink 1.2s steps(1) infinite; }
+
+/* HUD level bar + toast */
+.hud-l .lvl { color: #7fe3a0; }
+.bar { display: inline-block; width: 64px; height: 12px; border: 2px solid #ffffff; position: relative; vertical-align: -1px; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #ffcc4d; transition: width .3s steps(5); }
+@media (max-width: 440px) { .bar { display: none; } .hud-l { gap: 14px; } }
+.toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 72px); transform: translateX(-50%); z-index: 8;
+  font: 10px/1.4 var(--f-pixel); background: #12132a; color: #ffcc4d; border: 4px solid #000000; padding: 10px 14px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5); white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis;
+}
+.toast.show { animation: toastIn 1.9s linear forwards; }
+@keyframes toastIn { 0% { transform: translate(-50%, -16px); opacity: 0; } 8%, 85% { transform: translate(-50%, 0); opacity: 1; } 100% { transform: translate(-50%, 0); opacity: 0; } }
+.cf { position: fixed; top: -12px; width: 8px; height: 8px; z-index: 20; pointer-events: none; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(1turn); } }
+
+/* motion */
+.dialog { animation: dlgIn .5s steps(5) both; }
+@keyframes dlgIn { from { transform: translateY(14px) scale(0.97); } }
+.eyebrow::before { display: inline-block; animation: spin 2.4s steps(8) infinite; }
+@keyframes spin { to { transform: rotate(1turn); } }
+.lv { animation: bob 1.4s steps(2) infinite; }
+@keyframes bob { 50% { transform: translateY(-3px); } }
+.hit { animation: popIn .36s steps(3); }
+@keyframes popIn { 0% { transform: translateY(14px); } 60% { transform: translateY(-3px); } }
+.quest, .bag, .train article, .boss, .row { transition: transform .12s steps(2), box-shadow .12s steps(2); }
+.quest:hover, .bag:hover, .train article:hover, .boss:hover, .row:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--shadow); }
+.slot, .chip { transition: background .1s steps(1); }
+.slot:hover, .chip:hover { animation: hop .3s steps(3); background: var(--gold); color: #1a1c35; }
+@keyframes hop { 50% { transform: translateY(-5px); } }
+.step { animation: flow 5s steps(1) infinite; }
+.step:nth-child(2) { animation-delay: 1s; } .step:nth-child(3) { animation-delay: 2s; } .step:nth-child(4) { animation-delay: 3s; } .step:nth-child(5) { animation-delay: 4s; }
+@keyframes flow { 0%, 19% { background: var(--gold); color: #1a1c35; transform: translateX(6px); } 20%, 100% { background: var(--chip); color: var(--ink); transform: none; } }
+.cd { display: inline-block; color: var(--accent); min-width: 1ch; }
+.cd.tick { animation: tick .35s steps(3); }
+@keyframes tick { from { transform: scale(1.7); } }
+.pbtn { transition: transform .1s steps(2); }
+.pbtn:hover { transform: translate(-2px, -2px); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; }
+}
+</style>
+
+<header class="hud">
+  <div class="wrap">
+    <div class="hud-l"><a href="#top">A.G.UÇAR</a><span class="lvl">LV <span id="lvl">1</span></span><span class="bar" aria-hidden="true"><i id="bar"></i></span><span class="xp">XP <span id="xp">000000</span></span></div>
+    <ul>
+      <li><a href="#hakkimda">Hakkımda</a></li>
+      <li><a href="#deneyim">Deneyim</a></li>
+      <li><a href="#proje">Proje</a></li>
+      <li><a href="#yetenekler">Yetenekler</a></li>
+      <li><a href="#egitim">Eğitim</a></li>
+      <li><a href="#iletisim">İletişim</a></li>
+    </ul>
+  </div>
+</header>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<main id="top">
+  <div class="hero">
+    <div class="scene" id="scene-box" aria-hidden="true"><canvas id="scene"></canvas></div>
+    <button class="pbtn alt pause" id="pause" type="button" aria-pressed="false" aria-label="Sahne animasyonunu durdur veya oynat">❚❚ DURDUR</button>
+    <div class="wrap">
+      <div class="dialog px">
+        <span class="tag">PLAYER 1</span>
+        <h1>AHMET GÖKHAN UÇAR</h1>
+        <p class="cls"><span><b>SINIF</b> Full Stack Developer</span><span><b>YAN SINIF</b> Bilgi İşlem Uzmanı</span><span><b>ÜS</b> İstanbul</span></p>
+        <p class="lede">React, TypeScript ve NestJS ile web uygulamaları geliştiriyorum. Hukuk alanında yapay zeka ürünlerinde çalıştım, kurumsal IT altyapısını da ayakta tutmayı biliyorum.</p>
+        <div class="btns">
+          <a class="pbtn" href="#iletisim">▶ İLETİŞİM</a>
+          <a class="pbtn alt" href="https://github.com/Agokhanucar" target="_blank" rel="noopener">GITHUB</a>
+        </div>
+        <p class="hint">İpucu: sahneye tıkla, XP topla<span>_</span></p>
+      </div>
+    </div>
+  </div>
+
+  <section id="hakkimda">
+    <div class="wrap">
+      <div class="head"><p class="eyebrow">OYUNCU KARTI</p><h2>Hakkımda</h2></div>
+      <div class="card">
+        <div class="portrait px">
+          <div class="frame">
+            <canvas id="pix" width="44" height="44" aria-label="Ahmet Gökhan Uçar, 8-bit portre"></canvas>
+            <img id="real" src="photo.jpg" alt="Ahmet Gökhan Uçar" hidden>
+          </div>
+          <button class="pbtn alt" id="swap" type="button">GERÇEK FOTO</button>
+        </div>
+        <div>
+          <dl class="stats">
+            <dt>SINIF</dt><dd>Full Stack Developer</dd>
+            <dt>YAN SINIF</dt><dd>Bilgi İşlem · Network</dd>
+            <dt>ANA SİLAH</dt><dd>React · TypeScript · NestJS</dd>
+            <dt>DİLLER</dt><dd>Türkçe · İngilizce (B1)</dd>
+            <dt>AKTİF GÖREV</dt><dd>Yönetim Bilişim Sistemleri, Topkapı Üni.</dd>
+          </dl>
+          <p>Frontend ve backend tarafında profesyonel deneyime sahip bir Full Stack Developer'ım. React, TypeScript, Node.js ve NestJS ile güvenli, performans odaklı web uygulamaları geliştirdim.</p>
+          <p>New Mind'da yapay zeka ekibiyle birlikte hukuk alanına özel dil modellerini (LLM) uygulama katmanına bağladım. Ham veriyi modelin anlayacağı biçime getiren ve yanıtı kullanıcıya ulaştıran API'leri kurdum.</p>
+          <p>Yazılımı IT tarafıyla birleştiriyorum: API tasarımı ve arama optimizasyonunun yanında ağ takibi, donanım ve yazılım desteği ile sorun gidermede de deneyimliyim.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="deneyim" class="band">
+    <div class="wrap">
+      <div class="head"><p class="eyebrow">GÖREV GÜNLÜĞÜ</p><h2>İş Deneyimi</h2></div>
+      <ol class="quests">
+        <li class="quest px">
+          <div class="lv">LV<strong>3</strong></div>
+          <div>
+            <div class="q-top"><h3>Bilgi İşlem Sorumlusu</h3><span class="when">OCA 2026 – EYL 2026</span></div>
+            <p class="org"><b>NMS Law Office</b> · İstanbul</p>
+            <ul>
+              <li>Şirket genelinde bilgisayar, yazıcı, tarayıcı, ağ ve internet altyapısının kurulum, bakım ve teknik desteği.</li>
+              <li>Windows, Microsoft Office, donanım ve yazılım sorunlarında son kullanıcı desteği; kurulum, format, sürücü ve güncellemeler.</li>
+              <li>Sunucu ve şirket içi sistemlerde erişilebilirlik, performans ve süreklilik kontrolleri.</li>
+              <li>TCP/IP, LAN, modem ve switch kaynaklı ağ sorunlarının analizi ve çözümü.</li>
+              <li>Kurumsal yazılımların kurulum, lisans ve erişim takibi; e-imza, UETS ve ArkSigner sorunlarının giderilmesi.</li>
+            </ul>
+            <div class="chips"><span class="chip">Windows</span><span class="chip">TCP/IP · LAN</span><span class="chip">E-imza</span><span class="chip">UETS</span><span class="chip">ArkSigner</span></div>
+          </div>
+        </li>
+        <li class="quest px">
+          <div class="lv">LV<strong>2</strong></div>
+          <div>
+            <div class="q-top"><h3>Full Stack Developer</h3><span class="when">OCA 2025 – OCA 2026</span></div>
+            <p class="org"><b>New Mind Bilgi Yönetim A.Ş.</b> · İstanbul</p>
+            <ul>
+              <li>Node.js, TypeScript, Express.js ve NestJS ile backend servisleri geliştirdim.</li>
+              <li>Yapay zeka ekibi için ham veriyi işleyip modele uygun formatta (JSON/Context) ileten ve yanıtları kullanıcıya sunan API mimarileri kurdum.</li>
+              <li>Legal AI asistanında kullanıcı sorgularını zenginleştirip yapay zeka servislerine aktaran interaktif chat modülleri geliştirdim.</li>
+              <li>React.js ve Next.js ile performans odaklı arayüzler oluşturdum.</li>
+              <li>JWT tabanlı kimlik doğrulama ve yetkilendirme süreçlerini uyguladım.</li>
+              <li>PostgreSQL, MongoDB ve Elasticsearch ile veri modelleme ve sorgu optimizasyonu yaptım.</li>
+              <li>Git tabanlı ekip çalışması ve code review süreçlerinde aktif rol aldım.</li>
+            </ul>
+            <div class="chips"><span class="chip">NestJS</span><span class="chip">Next.js</span><span class="chip">TypeScript</span><span class="chip">Elasticsearch</span><span class="chip">JWT</span><span class="chip">LLM</span></div>
+          </div>
+        </li>
+        <li class="quest px">
+          <div class="lv">LV<strong>1</strong></div>
+          <div>
+            <div class="q-top"><h3>Full Stack Developer Intern</h3><span class="when">2023 – OCA 2025</span></div>
+            <p class="org"><b>New Mind Bilgi Yönetim A.Ş.</b> · İstanbul</p>
+            <ul>
+              <li>React, TypeScript ve Mantine ile responsive web uygulamaları geliştirdim.</li>
+              <li>Frontend ile backend arasındaki API entegrasyonlarını gerçekleştirdim.</li>
+            </ul>
+            <span class="lvup">LEVEL UP! → Tam zamanlı Full Stack Developer</span>
+            <div class="chips"><span class="chip">React</span><span class="chip">Mantine</span><span class="chip">REST API</span></div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="proje">
+    <div class="wrap">
+      <div class="head"><p class="eyebrow">ANA GÖREV</p><h2>Öne Çıkan Proje</h2></div>
+      <div class="boss px">
+        <div>
+          <h3>Legal AI Asistanı</h3>
+          <p>Hukuk alanına özel dil modellerini kullanan bir yapay zeka asistanı. Kullanıcı sorgularını bağlamla zenginleştirip modele ileten chat modülünü ve veri akışını yöneten API katmanını geliştirdim.</p>
+          <div class="chips"><span class="chip">Node.js</span><span class="chip">NestJS</span><span class="chip">React</span><span class="chip">LLM</span></div>
+        </div>
+        <div class="path" aria-label="Veri akışı">
+          <div class="step"><i>1</i>Kullanıcı sorgusu gelir</div>
+          <div class="step"><i>2</i>Sorgu bağlamla zenginleştirilir</div>
+          <div class="step"><i>3</i>JSON / Context olarak modele gider</div>
+          <div class="step"><i>4</i>LLM servisi yanıt üretir</div>
+          <div class="step last"><i>✓</i>Yanıt chat arayüzünde gösterilir</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="yetenekler" class="band">
+    <div class="wrap">
+      <div class="head"><p class="eyebrow">ENVANTER</p><h2>Teknik Beceriler</h2></div>
+      <div class="inv">
+        <div class="bag px"><p class="eyebrow">UYGULAMA</p><h3>Frontend</h3>
+          <div class="slots"><span class="slot">JavaScript (ES6+)</span><span class="slot">TypeScript</span><span class="slot">React.js</span><span class="slot">Next.js</span><span class="slot">Mantine</span><span class="slot">HTML</span><span class="slot">CSS</span></div></div>
+        <div class="bag px"><p class="eyebrow">SERVİS</p><h3>Backend</h3>
+          <div class="slots"><span class="slot">Node.js</span><span class="slot">Express.js</span><span class="slot">NestJS</span><span class="slot">RESTful API</span><span class="slot">JWT Auth</span><span class="slot">Go <small>(temel)</small></span></div></div>
+        <div class="bag px"><p class="eyebrow">VERİ</p><h3>Veritabanı &amp; Araçlar</h3>
+          <div class="slots"><span class="slot">PostgreSQL</span><span class="slot">MongoDB</span><span class="slot">Elasticsearch</span><span class="slot">Git</span></div></div>
+        <div class="bag px"><p class="eyebrow">ALTYAPI</p><h3>IT &amp; Sistem</h3>
+          <div class="slots"><span class="slot">Windows</span><span class="slot">Microsoft Office</span><span class="slot">Donanım / Yazılım Desteği</span><span class="slot">Sunucu Takibi</span><span class="slot">Kurulum &amp; Yapılandırma</span></div></div>
+        <div class="bag px"><p class="eyebrow">AĞ</p><h3>Network</h3>
+          <div class="slots"><span class="slot">TCP/IP</span><span class="slot">LAN</span><span class="slot">Modem</span><span class="slot">Switch</span><span class="slot">Sorun Giderme</span></div></div>
+        <div class="bag px"><p class="eyebrow">KURUMSAL</p><h3>Kurumsal Sistemler</h3>
+          <div class="slots"><span class="slot">E-imza</span><span class="slot">UETS</span><span class="slot">ArkSigner</span><span class="slot">Uygulama Desteği</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="egitim">
+    <div class="wrap">
+      <div class="head"><p class="eyebrow">ANTRENMAN</p><h2>Eğitim</h2></div>
+      <div class="train">
+        <article class="px"><span class="when now">2026 – DEVAM EDİYOR</span><h3>Yönetim Bilişim Sistemleri</h3><p>İstanbul Topkapı Üniversitesi · İngilizce</p></article>
+        <article class="px"><span class="when">2021 – 2024</span><h3>Bilgisayar Programcılığı</h3><p>İstanbul Aydın Üniversitesi · İngilizce</p></article>
+        <article class="px"><span class="when">ARALIK 2024</span><h3>NewMind AI Full Stack Bootcamp</h3><p>Patika.dev · 200+ saatlik yoğun eğitim, gerçek dünya projeleri</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="iletisim" class="band">
+    <div class="wrap cont">
+      <p class="big">DEVAM? <span class="cd" id="cd">9</span></p>
+      <p class="sub">Full stack geliştirme ya da IT destek rolleri için bir sonraki bölümü birlikte oynayalım.</p>
+      <div class="contact">
+        <div class="row px"><div><div class="k">E-POSTA</div><div class="v" id="mail">agkhnucar02@outlook.com</div></div><button class="pbtn" id="copy" type="button">KOPYALA</button></div>
+        <div class="row px"><div><div class="k">GITHUB</div><a class="v" href="https://github.com/Agokhanucar" target="_blank" rel="noopener">github.com/Agokhanucar</a></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>© 2026 AHMET GÖKHAN UÇAR</span><span>↑↑↓↓←→←→BA</span><span class="ps">PRESS START</span></div></footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var still = false; // scene keeps moving unless the visitor pauses it
+
+  /* ---------- XP counter ---------- */
+  var xp = 0, xpEl = document.getElementById('xp');
+  var lv = 1, lvEl = document.getElementById('lvl'), barEl = document.getElementById('bar'), toastEl = document.getElementById('toast'), toastT;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    toastEl.classList.remove('show'); void toastEl.offsetWidth; toastEl.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function () { toastEl.hidden = true; }, 1900);
+  }
+  function addXP(n, msg) {
+    xp += n; xpEl.textContent = String(xp).padStart(6, '0');
+    var nl = 1 + Math.floor(xp / 100);
+    barEl.style.width = (xp % 100) + '%';
+    if (nl > lv) { lv = nl; lvEl.textContent = lv; toast('LEVEL UP! LV ' + lv); }
+    else if (msg) toast(msg);
+  }
+
+  /* ---------- scene ---------- */
+  var box = document.getElementById('scene-box');
+  var cv = document.getElementById('scene');
+  var ctx = cv.getContext('2d');
+  var W = 0, H = 0, SC = 4, C = {};
+
+  function readColors() {
+    var cs = getComputedStyle(document.documentElement);
+    ['sky1','sky2','sky3','city','city2','water','water2','grass','grass2','dirt','dirt2','cloud','cloud2'].forEach(function (k) { C[k] = cs.getPropertyValue('--' + k).trim(); });
+    C.night = cs.getPropertyValue('--night').trim() === '1';
+  }
+
+  function resize() {
+    var r = box.getBoundingClientRect();
+    SC = r.width < 700 ? 3 : (r.width > 1500 ? 5 : 4);
+    W = Math.ceil(r.width / SC); H = Math.ceil(r.height / SC);
+    cv.width = W; cv.height = H;
+    cv.style.width = W * SC + 'px'; cv.style.height = H * SC + 'px';
+    ctx.imageSmoothingEnabled = false;
+    buildCity();
+    draw(performance.now());
+  }
+
+  // seeded random so the skyline stays put
+  function rng(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+
+  function R(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
+  function disc(cx, cy, r, c) { for (var dy = -r; dy <= r; dy++) { var w = Math.floor(Math.sqrt(r * r - dy * dy)); R(cx - w, cy + dy, 2 * w + 1, 1, c); } }
+
+  var city = [], stars = [], wins = [];
+  function buildCity() {
+    var rand = rng(42), x = -2; city = []; wins = [];
+    while (x < W + 10) {
+      var w = 5 + Math.floor(rand() * 8), h = 6 + Math.floor(rand() * 16);
+      city.push({ x: x, w: w, h: h, tone: rand() < 0.5 });
+      for (var wy = 3; wy < h - 2; wy += 3) for (var wx = 1; wx < w - 1; wx += 2) if (rand() < 0.35) wins.push({ x: x + wx, y: wy });
+      x += w + (rand() < 0.3 ? 1 : 0);
+    }
+    var sr = rng(7); stars = [];
+    for (var i = 0; i < W * H / 260; i++) stars.push({ x: Math.floor(sr() * W), y: Math.floor(sr() * H * 0.6), p: sr() * 6 });
+  }
+
+  var clouds = [{ x: 0.1, y: 14, s: 1 }, { x: 0.45, y: 26, s: 0.7 }, { x: 0.78, y: 10, s: 0.85 }];
+  function cloud(x, y) {
+    disc(x, y, 4, C.cloud2); disc(x + 6, y - 3, 5, C.cloud2); disc(x + 13, y, 4, C.cloud2);
+    disc(x, y - 1, 4, C.cloud); disc(x + 6, y - 4, 5, C.cloud); disc(x + 13, y - 1, 4, C.cloud);
+    R(x - 4, y + 2, 22, 2, C.cloud2);
+  }
+
+  // me, sitting, facing right
+  var SPRITE = [
+    "......HhHHH...........",
+    "....HHHHHhHHH.........",
+    "...HHHhHHHHHHH........",
+    "...HHHHHHHHHHHH.......",
+    "..HHHHHHHHHHSHH.......",
+    "..HHHHHHHHSSSSS.......",
+    "..HHHHHHSSSSESS.......",
+    "...HHHHsSSSSSSSS......",
+    "...HHHSSSSSSSSS.......",
+    "...HHBSSSSSBBBS.......",
+    "....BBBBBBBBBB........",
+    "....BBBBBBBBB.........",
+    ".....BBBBBBB..........",
+    "......sSSS............",
+    "....TTTTTTTT..........",
+    "...TTTTTTTTTT.........",
+    "...TTTTTtTTTTSS.......",
+    "...TTTTTtTTTSSSSSS....",
+    "...TTTTTtTTT....SSSS..",
+    "...TTTTTTTTT..........",
+    "...TTTTTTTTT..........",
+    "...JJJJJJJJJJJJJ......",
+    "...jJJJJJJJJJJJJ......",
+    "..........JJJJ........",
+    "..........JJjJ........",
+    "..........JJjJ........",
+    "..........KKKKKK......"
+  ];
+  var HAND_B = "...TTTTTtTTT....SS.SS.";
+  var PAL = { H: '#2a1c14', h: '#4b3324', S: '#f0c4a4', s: '#d39a7b', B: '#2b1e17', E: '#15131a', T: '#1c1e26', t: '#343949', J: '#3c5db0', j: '#2c4589', K: '#3a2a22' };
+
+  function sprite(x0, y0, typing, blinking) {
+    for (var r = 0; r < SPRITE.length; r++) {
+      var row = (r === 18 && typing) ? HAND_B : SPRITE[r];
+      for (var c = 0; c < row.length; c++) {
+        var k = row[c]; if (k === '.') continue;
+        if (k === 'E' && blinking) k = 'S';
+        R(x0 + c, y0 + r, 1, 1, PAL[k]);
+      }
+    }
+  }
+
+  var CODE = [[1, 9, '#7dffa0'], [3, 13, '#ffd75a'], [3, 8, '#7dffa0'], [5, 11, '#8fc8ff'], [3, 6, '#7dffa0'], [1, 4, '#ffd75a']];
+  var CODE_TOTAL = CODE.reduce(function (a, l) { return a + l[1]; }, 0);
+
+  function draw(t) {
+    if (!W) return;
+    var s = t / 1000, gy = H - 12;
+    // sky bands with dithered seams
+    var b1 = Math.floor(gy * 0.38), b2 = Math.floor(gy * 0.68);
+    R(0, 0, W, b1, C.sky1); R(0, b1, W, b2 - b1, C.sky2); R(0, b2, W, gy - b2, C.sky3);
+    for (var x = 0; x < W; x += 2) { R(x, b1 - 1, 1, 1, C.sky2); R(x + 1, b2 - 1, 1, 1, C.sky3); }
+
+    if (C.night) {
+      stars.forEach(function (st) { if (Math.sin(s * 1.5 + st.p) > -0.4) R(st.x, st.y, 1, 1, '#e8ecff'); });
+      var mx0 = Math.round(W * (W < 220 ? 0.5 : 0.86)), my0 = 14; disc(mx0, my0, 5, '#f4f1d8'); disc(mx0 + 3, my0 - 2, 4, C.sky1);
+    } else {
+      var sx = Math.round(W * (W < 220 ? 0.5 : 0.86)), sy = 14; disc(sx, sy, 6, '#ffe58a'); disc(sx, sy, 5, '#ffd23f');
+    }
+
+    clouds.forEach(function (cl) {
+      var cx = ((cl.x * (W + 40) + (still ? 0 : s * 4 * cl.s)) % (W + 40)) - 20;
+      cloud(Math.round(cx), cl.y);
+    });
+
+    // shooting star
+    if (C.night && !still) {
+      var ph = (s % 6) / 0.9;
+      if (ph < 1) { var ssx = Math.round(W * 0.2 + ph * 50), ssy = Math.round(4 + ph * 18); for (var q = 0; q < 6; q++) { ctx.globalAlpha = 1 - q * 0.16; R(ssx - q * 3, ssy - q, 2, 1, '#ffffff'); } ctx.globalAlpha = 1; }
+    }
+    // seagulls
+    var gull = C.night ? '#c9cdf2' : '#2a2f55';
+    for (var gi = 0; gi < 3; gi++) {
+      var gX = Math.round(((s * (12 + gi * 4) + gi * 97) % (W + 30)) - 15), gY = 26 + gi * 8 + Math.round(Math.sin(s * 1.3 + gi) * 2);
+      if (Math.floor(s * 6 + gi) % 2) { R(gX, gY, 1, 1, gull); R(gX + 1, gY + 1, 2, 1, gull); R(gX + 3, gY + 2, 1, 1, gull); R(gX + 4, gY + 1, 2, 1, gull); R(gX + 6, gY, 1, 1, gull); }
+      else { R(gX, gY + 3, 1, 1, gull); R(gX + 1, gY + 2, 2, 1, gull); R(gX + 3, gY + 2, 1, 1, gull); R(gX + 4, gY + 2, 2, 1, gull); R(gX + 6, gY + 3, 1, 1, gull); }
+    }
+
+    // İstanbul skyline
+    var base = gy - 5;
+    city.forEach(function (b) { R(b.x, base - b.h, b.w, b.h, b.tone ? C.city : C.city2); });
+    if (C.night) wins.forEach(function (w, i) { if ((i * 7) % 5 !== 0) return; var b = base - 2 - w.y; R(w.x, b, 1, 1, '#ffd45e'); });
+    var land = C.night ? '#151a46' : '#6f95d6';
+    // mosque
+    var mq = Math.round(W * 0.14);
+    R(mq - 14, base - 9, 28, 9, land); disc(mq, base - 10, 7, land); R(mq - 7, base - 10, 15, 2, land);
+    disc(mq - 10, base - 9, 4, land); disc(mq + 10, base - 9, 4, land); R(mq, base - 19, 1, 3, land);
+    [-17, 17].forEach(function (o) { R(mq + o - 1, base - 26, 2, 26, land); R(mq + o - 2, base - 18, 4, 1, land); R(mq + o - 1, base - 29, 1, 3, land); R(mq + o, base - 28, 1, 2, land); });
+    // Galata tower
+    var gx = Math.round(W * 0.36);
+    R(gx - 4, base - 24, 8, 24, land); R(gx - 5, base - 26, 10, 2, land);
+    for (var i = 0; i < 6; i++) R(gx - 4 + Math.ceil(i * 0.7), base - 27 - i, 8 - Math.ceil(i * 0.7) * 2, 1, land);
+    R(gx, base - 34, 1, 2, land);
+    if (C.night) { R(gx - 3, base - 25, 6, 1, '#ffd45e'); R(gx - 1, base - 18, 2, 2, '#ffd45e'); }
+
+    // Bosphorus
+    R(0, base, W, 5, C.water);
+    for (var wx = 0; wx < W; wx += 6) { var o = Math.floor((s * 3 + wx) % 6); R(wx + o, base + 1 + (wx / 6 % 3), 2, 1, C.water2); }
+
+    // ferry on the Bosphorus
+    var fx = Math.round(((s * 7) % (W + 50)) - 25);
+    R(fx + 1, base - 2, 17, 2, '#f4f4f4'); R(fx, base, 18, 1, '#1d1f26'); R(fx + 1, base + 1, 16, 1, '#1d1f26');
+    R(fx + 4, base - 4, 10, 2, '#f4f4f4');
+    for (var fw = 0; fw < 5; fw++) R(fx + 5 + fw * 2, base - 3, 1, 1, C.night ? '#ffd45e' : '#2d63d8');
+    R(fx + 8, base - 7, 2, 3, '#f4f4f4'); R(fx + 8, base - 7, 2, 1, '#1d1f26');
+    if (!still) { var sp = Math.floor(s * 3) % 3; R(fx + 7 - sp, base - 9 - sp, 2, 1, 'rgba(230,232,240,0.75)'); R(fx + 5 - sp * 2, base - 11 - sp, 2, 1, 'rgba(230,232,240,0.45)'); }
+
+    // ground
+    R(0, gy, W, H - gy, C.dirt); R(0, gy, W, 2, C.grass); R(0, gy + 2, W, 1, C.grass2);
+    for (var dx = 0; dx < W; dx += 5) R(dx + ((dx * 3) % 4), gy + 5 + ((dx * 7) % 4), 1, 1, C.dirt2);
+
+    // desk set
+    var cx0 = W < 220 ? W - 66 : Math.round(W * 0.64), top = gy - 27;
+    // chair
+    var chair = C.night ? '#4a3f7a' : '#5b4c9a', chair2 = '#3b3266';
+    R(cx0, gy - 19, 2, 14, chair); R(cx0 + 1, gy - 4, 10, 1, chair); R(cx0 + 6, gy - 3, 2, 2, chair2); R(cx0 + 2, gy - 1, 10, 1, chair2);
+    // desk
+    var wood = '#9a6332', woodL = '#c08a4f', woodD = '#6e431f';
+    R(cx0 + 14, gy - 8, 48, 1, woodL); R(cx0 + 14, gy - 7, 48, 1, wood); R(cx0 + 14, gy - 6, 48, 1, woodD);
+    R(cx0 + 16, gy - 5, 2, 5, woodD); R(cx0 + 58, gy - 5, 2, 5, woodD);
+    // keyboard
+    R(cx0 + 14, gy - 9, 11, 1, '#c9ccd6'); for (var k = 0; k < 11; k += 2) R(cx0 + 14 + k, gy - 9, 1, 1, '#9da1b0');
+    // CRT
+    var mx = cx0 + 28, my = gy - 29;
+    if (C.night) { ctx.fillStyle = 'rgba(125,255,160,0.10)'; ctx.fillRect(mx - 18, my - 4, 44, 26); ctx.fillRect(cx0 + 6, top + 2, 12, 12); }
+    R(mx, my, 24, 19, '#d9d0b6'); R(mx, my + 18, 24, 1, '#b3a989'); R(mx + 23, my, 1, 19, '#b3a989');
+    R(mx + 2, my + 2, 20, 14, '#0d1a12');
+    R(mx + 9, gy - 10, 6, 1, '#b3a989'); R(mx + 6, gy - 9, 12, 1, '#d9d0b6');
+    R(mx + 19, my + 17, 2, 1, '#53d36b');
+    var shown = still ? CODE_TOTAL : Math.floor((s * 9) % (CODE_TOTAL + 18)), cur = null;
+    CODE.forEach(function (l, i) {
+      var n = Math.max(0, Math.min(l[1], shown)); shown -= l[1];
+      if (n > 0) R(mx + 3 + l[0], my + 3 + i * 2, n, 1, l[2]);
+      if (n > 0 && n < l[1] && !cur) cur = [mx + 3 + l[0] + n, my + 3 + i * 2];
+    });
+    if (!cur) cur = [mx + 3, my + 3 + CODE.length * 2 - 2 + 2];
+    if (Math.floor(s * 2) % 2 === 0) R(cur[0], cur[1], 1, 1, '#eaffef');
+    // mug + steam
+    R(cx0 + 54, gy - 12, 3, 4, '#f2f2f2'); R(cx0 + 54, gy - 11, 3, 1, '#e2463b'); R(cx0 + 57, gy - 11, 1, 2, '#f2f2f2');
+    if (!still) { var st = Math.floor(s * 4) % 4; R(cx0 + 55 + (st % 2), gy - 14 - st, 1, 1, 'rgba(255,255,255,0.7)'); }
+    // me
+    var typing = !still && Math.floor(s * 7) % 2 === 0;
+    var blinking = !still && (s % 3.6) < 0.14;
+    sprite(cx0, top, typing, blinking);
+    // cat strolling by
+    var CAT = ['k....k.k', '.k...kek', '.kkkkkk.', Math.floor(s * 6) % 2 ? '.k.k..k.' : '..k.k.k.'];
+    var catX = Math.round(((s * 9) % (W + 20)) - 10);
+    CAT.forEach(function (row, ry) { for (var rx = 0; rx < row.length; rx++) { if (row[rx] !== '.') R(catX + rx, gy - 4 + ry, 1, 1, row[rx] === 'e' ? '#1a1c35' : '#ff9f43'); } });
+  }
+
+  var last = 0, running = true;
+  function loop(t) { if (running && !still && t - last > 50) { last = t; draw(t); } requestAnimationFrame(loop); }
+
+  readColors();
+  resize();
+  requestAnimationFrame(loop);
+  var pauseBtn = document.getElementById('pause');
+  pauseBtn.addEventListener('click', function (e) {
+    e.stopPropagation(); still = !still;
+    pauseBtn.textContent = still ? '▶ OYNAT' : '❚❚ DURDUR';
+    pauseBtn.setAttribute('aria-pressed', String(still));
+    draw(performance.now());
+  });
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(box); else window.addEventListener('resize', resize);
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { running = e[0].isIntersecting; }).observe(box);
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function retheme() { readColors(); draw(performance.now()); }
+  if (mq.addEventListener) mq.addEventListener('change', retheme);
+  new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (document.fonts) document.fonts.ready.then(resize);
+
+  // clicks → XP pops
+  var POPS = ['+10 XP', '200 OK', 'git push', '</>', '+1 commit', 'npm run dev', 'BUG FIXED!'];
+  box.addEventListener('click', function (e) {
+    addXP(10);
+    var r = box.parentNode.getBoundingClientRect();
+    var p = document.createElement('span'); p.className = 'pop';
+    p.textContent = POPS[Math.floor(Math.random() * POPS.length)];
+    p.style.left = (e.clientX - r.left) + 'px'; p.style.top = (e.clientY - r.top) + 'px';
+    box.parentNode.appendChild(p);
+    setTimeout(function () { p.remove(); }, 1000);
+  });
+
+  /* ---------- 8-bit portrait ---------- */
+  var pix = document.getElementById('pix'), real = document.getElementById('real'), swap = document.getElementById('swap');
+  var img = new Image();
+  img.onload = function () {
+    var N = pix.width, p = pix.getContext('2d');
+    p.drawImage(img, 0, 0, N, N);
+    try {
+      var d = p.getImageData(0, 0, N, N), a = d.data;
+      for (var i = 0; i < a.length; i += 4) {
+        var r = a[i], g = a[i + 1], b = a[i + 2];
+        if (r > 225 && g > 225 && b > 225) { a[i + 3] = 0; continue; }
+        a[i] = Math.min(255, Math.round(r / 40) * 40); a[i + 1] = Math.min(255, Math.round(g / 40) * 40); a[i + 2] = Math.min(255, Math.round(b / 40) * 40);
+      }
+      p.putImageData(d, 0, 0);
+    } catch (err) { /* file:// can block pixel access; the downscaled image still reads as 8-bit */ }
+  };
+  img.src = real.getAttribute('src');
+  swap.addEventListener('click', function () {
+    var toReal = real.hidden;
+    real.hidden = !toReal; pix.hidden = toReal;
+    swap.textContent = toReal ? '8-BIT' : 'GERÇEK FOTO';
+    if (toReal) addXP(50);
+  });
+
+  /* ---------- discovering sections ---------- */
+  if ('IntersectionObserver' in window) {
+    var names = { hakkimda: 'Oyuncu Kartı', deneyim: 'Görev Günlüğü', proje: 'Ana Görev', yetenekler: 'Envanter', egitim: 'Antrenman', iletisim: 'Devam Ekranı' };
+    var secIO = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { secIO.unobserve(e.target); addXP(20, '+20 XP · ' + names[e.target.id] + ' keşfedildi'); } });
+    }, { threshold: 0.3 });
+    Object.keys(names).forEach(function (id) { secIO.observe(document.getElementById(id)); });
+    if (!reduce) {
+      var popIO = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { popIO.unobserve(e.target); e.target.classList.add('hit'); } });
+      }, { threshold: 0.2 });
+      document.querySelectorAll('section .px').forEach(function (el) { popIO.observe(el); });
+    }
+  }
+
+  /* ---------- continue countdown ---------- */
+  var cd = document.getElementById('cd'), cdN = 9, cdOn = false;
+  if (!reduce) {
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { cdOn = e[0].isIntersecting; }).observe(cd);
+    setInterval(function () {
+      if (!cdOn) return;
+      cdN = cdN > 0 ? cdN - 1 : 9; cd.textContent = cdN;
+      cd.classList.remove('tick'); void cd.offsetWidth; cd.classList.add('tick');
+    }, 1000);
+  }
+
+  /* ---------- cheat code ---------- */
+  var SEQ = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'], si = 0;
+  document.addEventListener('keydown', function (e) {
+    var k = (e.key || '').toLowerCase();
+    si = k === SEQ[si] ? si + 1 : (k === SEQ[0] ? 1 : 0);
+    if (si === SEQ.length) {
+      si = 0; addXP(1000); setTimeout(function () { toast('HİLE AKTİF! +1000 XP'); }, 900);
+      if (reduce) return;
+      var cols = ['#e2463b', '#ffcc4d', '#2d63d8', '#46b04a', '#ff9f43', '#ffffff'];
+      for (var i = 0; i < 80; i++) {
+        var c = document.createElement('i'); c.className = 'cf';
+        c.style.left = Math.random() * 100 + 'vw'; c.style.background = cols[i % cols.length];
+        c.style.animationDuration = (1.2 + Math.random() * 1.4) + 's'; c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c); setTimeout(c.remove.bind(c), 3000);
+      }
+    }
+  });
+
+  /* ---------- copy email ---------- */
+  var copy = document.getElementById('copy'), mail = document.getElementById('mail');
+  copy.addEventListener('click', function () {
+    function done(m) { copy.textContent = m; setTimeout(function () { copy.textContent = 'KOPYALA'; }, 1500); }
+    function sel() { var rg = document.createRange(); rg.selectNodeContents(mail); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); done('SEÇİLDİ'); }
+    try { navigator.clipboard.writeText(mail.textContent).then(function () { done('KOPYALANDI'); }, sel); } catch (e) { sel(); }
+  });
+})();
+</script>
+
+</body></html>
